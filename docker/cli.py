@@ -4,6 +4,9 @@ import argparse
 import json
 import time
 from faster_whisper import WhisperModel
+from utils import is_cuda_available
+
+download_root = os.environ.get("WHISPER_CACHE", "/models")
 
 def build_output_path(input_path, output_dir, fmt):
     filename = os.path.splitext(os.path.basename(input_path))[0]
@@ -41,8 +44,8 @@ def main():
 
     # Device detection without torch
     if args.device == "auto":
-        args.device = "cuda" if os.path.exists("/dev/nvidia0") else "cpu"
-    elif args.device == "cuda" and not os.path.exists("/dev/nvidia0"):
+        args.device = "cuda" if is_cuda_available() else "cpu"
+    elif args.device == "cuda" and not is_cuda_available():
         sys.exit("ERROR: CUDA requested but /dev/nvidia0 not found (is NVIDIA runtime available?).")
 
     # Determine compute type
@@ -66,7 +69,7 @@ def main():
     # Load model
     if args.verbose:
         print(f"> Loading model '{args.model}' on {args.device}...")
-    model = WhisperModel(args.model, device=args.device, compute_type=compute_type, cpu_threads=args.threads)
+    model = WhisperModel(args.model, device=args.device, compute_type=compute_type, cpu_threads=args.threads, download_root=download_root)
 
     # Transcribe
     try:

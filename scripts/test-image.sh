@@ -1,5 +1,19 @@
 #!/bin/bash
 set -e
+GPU_FLAGS=()
+
+# Parse variant
+VARIANT="$1"
+
+if [[ "$VARIANT" == "--cpu" ]]; then
+  IMAGE="vox-whisper:cpu"
+elif [[ "$VARIANT" == "--cuda" ]]; then
+  IMAGE="vox-whisper:cuda"
+  GPU_FLAGS=(--gpus all)
+else
+  echo "Usage: $0 [--cpu | --cuda]"
+  exit 1
+fi
 
 OUTPUT_DIR="tmp/test"
 OUTPUT_FILE="$OUTPUT_DIR/transcript.txt"
@@ -9,11 +23,12 @@ mkdir -p "$OUTPUT_DIR"
 chmod 777 "$OUTPUT_DIR"  # 🔐 Ensure container has write access
 rm -f "$OUTPUT_FILE"
 
-echo "🚀 Running containerized test..."
+echo "🚀 Running containerized test with image $IMAGE..."
 docker run --rm \
+  "${GPU_FLAGS[@]}" \
   -v "$PWD/$OUTPUT_DIR:/app/output" \
   --entrypoint python3 \
-  vox-whisper:cpu \
+  "$IMAGE" \
   /app/test.py
 
 # Confirm file was created
