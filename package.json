@@ -9,14 +9,16 @@
         "lint": "bun biome check",
         "lint:fix": "bun biome check --write",
         "prepare": "if [ \"$CI\" = \"true\" ]; then echo 'CI detected: skipping lefthook install'; else bunx lefthook install; fi",
+        "release": "release-it",
         "commitlint": "bunx commitlint --edit $1"
     },
     "devDependencies": {
-        "@types/bun": "latest",
         "@biomejs/biome": "^1.9.4",
         "@commitlint/cli": "^19.8.0",
         "@commitlint/config-conventional": "^19.8.0",
-        "lefthook": "^1.11.3"
+        "@types/bun": "latest",
+        "lefthook": "^1.11.3",
+        "release-it": "^18.1.2"
     },
     "peerDependencies": {
         "typescript": "^5.0.0"
