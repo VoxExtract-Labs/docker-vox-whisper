@@ -1,0 +1,25 @@
+FROM python:3.10-slim
+
+WORKDIR /app
+
+ENV WHISPER_CACHE=/models
+
+# Install dependencies
+RUN apt-get update && \
+    apt-get install -y ffmpeg && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+# Install faster-whisper
+RUN pip install --no-cache-dir faster-whisper
+
+# Pre-download default model to image
+RUN python3 -c "from faster_whisper import WhisperModel; WhisperModel('base', download_root='/models')"
+
+# Copy entire context (cli.py, test.py, audio/)
+COPY . /app/
+
+# Ensure output dir exists
+RUN mkdir -p /app/output
+
+ENTRYPOINT ["python3", "/app/cli.py"]
