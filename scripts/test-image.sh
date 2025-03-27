@@ -6,6 +6,7 @@ OUTPUT_FILE="$OUTPUT_DIR/transcript.txt"
 
 # Prepare clean output directory
 mkdir -p "$OUTPUT_DIR"
+chmod 777 "$OUTPUT_DIR"  # 🔐 Ensure container has write access
 rm -f "$OUTPUT_FILE"
 
 echo "🚀 Running containerized test..."
