@@ -15,6 +15,12 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     git \
     && rm -rf /var/lib/apt/lists/*
 
+# Add cuDNN runtime libraries (required for faster-whisper GPU inference)
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libcudnn8=8.9.5.29-1+cuda12.4 \
+    libcudnn8-dev=8.9.5.29-1+cuda12.4 \
+    && rm -rf /var/lib/apt/lists/*
+
 # Python packages
 RUN pip install --no-cache-dir faster-whisper==1.1.1
 
