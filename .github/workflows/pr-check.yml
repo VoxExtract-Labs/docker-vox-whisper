@@ -9,7 +9,9 @@ jobs:
   docker-test:
     name: Build & Test Image
     runs-on: ubuntu-latest
-
+    permissions:
+      contents: read
+      packages: write
     steps:
       - name: 📥 Checkout repository
         uses: actions/checkout@v4
@@ -38,13 +40,14 @@ jobs:
       - name: 🧼 Lint Dockerfile
         run: ./scripts/lint-image.sh
 
-      - name: 🐳 Build Docker Image with GHCR cache
+      - name: 🐳 Build Docker Image (load locally for testing)
         uses: docker/build-push-action@v6
         with:
           context: ./docker
           file: ./docker/Dockerfile.cpu
           push: false
-          tags: ghcr.io/voxextract-labs/vox-whisper:ci-cache
+          load: true  # ✅ this is key
+          tags: vox-whisper:cpu
           cache-from: type=registry,ref=ghcr.io/voxextract-labs/vox-whisper:ci-cache
           cache-to: type=registry,ref=ghcr.io/voxextract-labs/vox-whisper:ci-cache,mode=max,compress=true
 
