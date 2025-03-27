@@ -120,11 +120,15 @@ def main():
     else:
         output_content = "\n".join([s.text for s in segments])
 
+    # Write output to file or stdout
     if output_path:
-        with open(output_path, "w", encoding="utf-8") as f:
-            f.write(output_content)
-        if args.verbose:
-            print(f"> Output written to {output_path}")
+        try:
+            with open(output_path, "w", encoding="utf-8") as f:
+                f.write(output_content)
+            if args.verbose:
+                print(f"> Output written to {output_path}")
+        except IOError as e:
+            sys.exit(f"Error writing to output file {output_path}: {e}")
     else:
         print(output_content)
 
