@@ -25,7 +25,7 @@ def main():
     parser.add_argument("--language", default="en", help="Language code (default: en)")
     parser.add_argument("--device", default="cpu", choices=["cpu", "cuda", "auto"], help="Device to use")
     parser.add_argument("--output_format", default="txt", choices=["txt", "json", "srt"], help="Output format")
-    parser.add_argument("--timestamps", action="store_true", help="Include timestamps")
+    parser.add_argument("--timestamps", action="store_true", help="Include word-level timestamps (JSON only)")
     parser.add_argument("--threads", type=int, default=1, help="Number of CPU threads")
     parser.add_argument("--verbose", action="store_true", help="Enable verbose output")
 
@@ -78,7 +78,7 @@ def main():
             language=args.language,
             beam_size=5,
             vad_filter=False,
-            word_timestamps=args.timestamps or args.output_format == "json",
+            word_timestamps=args.timestamps,
             condition_on_previous_text=False
         )
         elapsed = time.time() - start
@@ -92,7 +92,15 @@ def main():
                 {
                     "start": s.start,
                     "end": s.end,
-                    "text": s.text
+                    "text": s.text,
+                    "words": [
+                        {
+                            "word": w.word,
+                            "start": w.start,
+                            "end": w.end,
+                            "probability": w.probability
+                        } for w in s.words
+                    ] if args.timestamps and hasattr(s, "words") and s.words else []
                 } for s in segments
             ],
             "language": args.language,
