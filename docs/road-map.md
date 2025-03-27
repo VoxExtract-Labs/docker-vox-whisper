@@ -33,20 +33,22 @@ Dockerized wrapper for faster-whisper with a minimal CLI interface. Includes CPU
 - [ ] Create two separate Dockerfiles:
   - `Dockerfile.cpu` → Lean image, for CI/dev/fallback
   - `Dockerfile.cuda` → Full CUDA image, for GPU-accelerated production
-- [ ] Write `scripts/cli.py` — custom CLI for faster-whisper
-  - [ ] Accepts: `--input`, `--output`, `--device`, `--model`, `--language`, `--output_format`
+- [x] Pre-download default model (e.g., `base`) in the image for faster CI runs
+- [x] Allow overriding model and cache directory via environment variable or volume mount
+- [x] Write `scripts/cli.py` — custom CLI for faster-whisper
+  - [x] Accepts: `--input`, `--output`, `--device`, `--model`, `--language`, `--output_format`
   - [ ] Detect device compatibility and throw an error if `cuda` is requested in CPU-only build
   - [ ] Basic stdout + file export (TXT/JSON/SRT)
 - [ ] Add `scripts/transcribe.sh` wrapper (optional)
-- [ ] Use CLI as Docker `ENTRYPOINT`
+- [x] Use CLI as Docker `ENTRYPOINT`
 
 ---
 
 ### Phase 4: Transcription & Testing
-- [ ] Add sample audio file (`test/audio/sample.mp3`)
-- [ ] Write `test/test.py` to:
-  - [ ] Run CLI on sample audio
-  - [ ] Validate output file or stdout
+- [x] Add sample audio file (`test/audio/sample.mp3`)
+- [x] Write `test/test.py` to:
+  - [x] Run CLI on sample audio
+  - [x] Validate output file or stdout
   - [ ] Confirm behavior in both CPU and CUDA builds
 - [ ] Use shell scripts for test orchestration (Bun still available as needed)
 
@@ -57,8 +59,8 @@ Dockerized wrapper for faster-whisper with a minimal CLI interface. Includes CPU
   - [x] Install and lint with Bun
   - [x] Set up Docker Buildx (caching infra in place)
   - [ ] Lint Dockerfiles
-  - [ ] Build Docker image (CPU) and test it
-  - [ ] Run `test/test.py` in container to validate CLI
+  - [x] Build Docker image (CPU) and test it
+  - [x] Run `test/test.py` in container to validate CLI
 
 ---
 
@@ -73,9 +75,9 @@ Dockerized wrapper for faster-whisper with a minimal CLI interface. Includes CPU
 ---
 
 ### CLI Feature Goals (`scripts/cli.py`)
-- [ ] Accept CLI arguments: `--input`, `--output`, `--model`, `--language`, `--device`, `--output_format`
-- [ ] Validate device availability (e.g., fail on `--device cuda` if no GPU)
-- [ ] Export to text, JSON, or SRT
-- [ ] Print summary or stats
+- [x] Accept CLI arguments: `--input`, `--output`, `--model`, `--language`, `--device`, `--output_format`
+- [x] Validate device availability (e.g., fail on `--device cuda` if no GPU)
+- [x] Export to text, JSON, or SRT
+- [x] Print summary or stats
 - [ ] Stream or batch transcription support
 
