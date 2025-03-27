@@ -7,11 +7,16 @@ on:
 
 jobs:
   docker-test:
-    name: Build & Test Image
+    name: Build & Test Images
     runs-on: ubuntu-latest
     permissions:
       contents: read
       packages: write
+
+    strategy:
+      matrix:
+        variant: [cpu, cuda]
+
     steps:
       - name: 📥 Checkout repository
         uses: actions/checkout@v4
@@ -38,18 +43,19 @@ jobs:
         run: bun run lint
 
       - name: 🧼 Lint Dockerfile
-        run: ./scripts/lint-image.sh
+        run: ./scripts/lint-image.sh --${{ matrix.variant }}
 
       - name: 🐳 Build Docker Image (load locally for testing)
         uses: docker/build-push-action@v6
         with:
           context: ./docker
-          file: ./docker/Dockerfile.cpu
+          file: ./docker/Dockerfile.${{ matrix.variant }}
           push: false
-          load: true  # ✅ this is key
-          tags: vox-whisper:cpu
+          load: true
+          tags: vox-whisper:${{ matrix.variant }}
           cache-from: type=registry,ref=ghcr.io/voxextract-labs/vox-whisper:ci-cache
           cache-to: type=registry,ref=ghcr.io/voxextract-labs/vox-whisper:ci-cache,mode=max,compress=true
 
       - name: 🧪 Run Test Image
-        run: ./scripts/test-image.sh
+        if: ${{ matrix.variant == 'cpu' }}
+        run: ./scripts/test-image.sh --${{ matrix.variant }}
