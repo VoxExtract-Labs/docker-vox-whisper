@@ -5,6 +5,8 @@ import json
 import time
 from faster_whisper import WhisperModel
 
+download_root = os.environ.get("WHISPER_CACHE", "/models")
+
 def build_output_path(input_path, output_dir, fmt):
     filename = os.path.splitext(os.path.basename(input_path))[0]
     return os.path.join(output_dir, f"{filename}.{fmt}")
@@ -66,7 +68,7 @@ def main():
     # Load model
     if args.verbose:
         print(f"> Loading model '{args.model}' on {args.device}...")
-    model = WhisperModel(args.model, device=args.device, compute_type=compute_type, cpu_threads=args.threads)
+    model = WhisperModel(args.model, device=args.device, compute_type=compute_type, cpu_threads=args.threads, download_root=download_root)
 
     # Transcribe
     try:
