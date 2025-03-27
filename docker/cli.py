@@ -9,6 +9,13 @@ def build_output_path(input_path, output_dir, fmt):
     filename = os.path.splitext(os.path.basename(input_path))[0]
     return os.path.join(output_dir, f"{filename}.{fmt}")
 
+def format_timestamp(seconds: float) -> str:
+    hours = int(seconds // 3600)
+    minutes = int((seconds % 3600) // 60)
+    secs = int(seconds % 60)
+    millis = int((seconds - int(seconds)) * 1000)
+    return f"{hours:02}:{minutes:02}:{secs:02},{millis:03}"
+
 def main():
     parser = argparse.ArgumentParser(description="Transcribe audio using faster-whisper")
     parser.add_argument("--input", required=True, help="Path to audio file to transcribe")
@@ -94,6 +101,14 @@ def main():
             "duration": round(elapsed, 2)
         }
         output_content = json.dumps(result, indent=2)
+    elif args.output_format == "srt":
+        output_lines = []
+        for i, s in enumerate(segments):
+            output_lines.append(f"{i+1}")
+            output_lines.append(f"{format_timestamp(s.start)} --> {format_timestamp(s.end)}")
+            output_lines.append(s.text.strip())
+            output_lines.append("")  # Empty line between subtitles
+        output_content = "\n".join(output_lines)
     else:
         output_content = "\n".join([s.text for s in segments])
 
