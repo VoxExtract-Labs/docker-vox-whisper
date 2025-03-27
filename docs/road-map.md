@@ -1,83 +1,108 @@
-## docker-vox-whisper: Roadmap
+## `docker-vox-whisper`: Roadmap
 
 ### Short Description
-Dockerized wrapper for faster-whisper with a minimal CLI interface. Includes CPU and GPU builds, CLI validation, and testing support. Built for VoiceExtractor.
+Dockerized wrapper for [faster-whisper](https://github.com/SYSTRAN/faster-whisper) with a minimal CLI interface. Includes CPU and CUDA builds, tagging strategy, and CI/CD integration. Built for the **VoiceExtractor** project.
 
 ---
 
 ### Phase 1: Foundation
 - [x] Decide on project direction: use custom CLI for smaller image
 - [x] Create GitHub repo `docker-vox-whisper`
-- [x] Add `.gitignore`, `LICENSE`, and `README.md`
-- [ ] Set up initial folder structure:
-  - `/docker` (for Dockerfiles)
-  - `/scripts` (for CLI + helpers)
-  - `/test` (for audio samples + test code)
+- [x] Add `.gitignore`, `LICENSE`, and initial `README.md`
+- [x] Set up initial folder structure:
+  - `/docker` → Dockerfiles, CLI, sample audio
+  - `/scripts` → Build, lint, and test shell scripts
+  - `/tmp/test` → Mounted output directory during container tests
+  - `/docs` → Project documentation (e.g., `dockerhub.md`)
 
 ---
 
 ### Phase 2: Tooling Setup
-- [x] Initialize `bun` project with `bun init`
-- [x] Add and configure:
-  - [x] `@commitlint/cli` and `@commitlint/config-conventional`
+- [x] Initialize project with Bun (for tooling only)
+- [x] Add and configure dev tools:
+  - [x] `@commitlint/cli` + `@commitlint/config-conventional`
   - [x] `lefthook` for Git hooks
-  - [x] `Biome` for linting
-- [x] Create `commitlint.config.js`
-- [x] Create `.lefthook.yml` config
-- [x] Run `bun install` and `npx lefthook install`
-- [x] Verify Conventional Commits are enforced on commit
+  - [x] `@biomejs/biome` for linting
+- [x] Add minimal `package.json` with dev-only dependencies
+- [x] Add `prepare` script for CI-friendly install
+- [x] Configure `lefthook.yml` and `commitlint.config.cjs`
 
 ---
 
 ### Phase 3: Docker Setup
-- [ ] Create two separate Dockerfiles:
-  - `Dockerfile.cpu` → Lean image, for CI/dev/fallback
-  - `Dockerfile.cuda` → Full CUDA image, for GPU-accelerated production
-- [x] Pre-download default model (e.g., `base`) in the image for faster CI runs
-- [x] Allow overriding model and cache directory via environment variable or volume mount
-- [x] Write `scripts/cli.py` — custom CLI for faster-whisper
-  - [x] Accepts: `--input`, `--output`, `--device`, `--model`, `--language`, `--output_format`
-  - [ ] Detect device compatibility and throw an error if `cuda` is requested in CPU-only build
-  - [ ] Basic stdout + file export (TXT/JSON/SRT)
-- [ ] Add `scripts/transcribe.sh` wrapper (optional)
+- [x] Create two standalone Dockerfiles:
+  - `Dockerfile.cpu` — lightweight CPU-only build
+  - `Dockerfile.cuda` — full CUDA-compatible image
+- [x] Set up model caching via `/models`
+- [x] Add `ENV WHISPER_CACHE=/models` support
+- [x] Create `/docker/cli.py`
+  - [x] Full CLI with validation, error handling, and format options
+  - [x] Supports `--input`, `--output`, `--device`, `--output_format`, `--timestamps`
+  - [x] Supports SRT formatting, JSON word timestamps, error handling
 - [x] Use CLI as Docker `ENTRYPOINT`
+- [ ] ✨ (Optional) Add `scripts/transcribe.sh` for host-side wrapper
 
 ---
 
 ### Phase 4: Transcription & Testing
-- [x] Add sample audio file (`test/audio/sample.mp3`)
-- [x] Write `test/test.py` to:
-  - [x] Run CLI on sample audio
-  - [x] Validate output file or stdout
-  - [ ] Confirm behavior in both CPU and CUDA builds
-- [ ] Use shell scripts for test orchestration (Bun still available as needed)
+- [x] Add sample audio: `docker/audio/sample.mp3`
+- [x] Add `docker/test.py` to:
+  - [x] Transcribe with both CPU and CUDA (if detected)
+  - [x] Validate output contents
+- [x] Add `scripts/test-image.sh`:
+  - [x] Takes `--cpu` or `--cuda`
+  - [x] Mounts `tmp/test` and confirms result
+  - [x] Handles GPU flags automatically
+- [x] CI skips CUDA test (unless run on GPU host)
 
 ---
 
 ### Phase 5: Automation
-- [x] Create GitHub Actions workflow (`.github/workflows/pr-check.yml`)
-  - [x] Install and lint with Bun
-  - [x] Set up Docker Buildx (caching infra in place)
-  - [ ] Lint Dockerfiles
-  - [x] Build Docker image (CPU) and test it
-  - [x] Run `test/test.py` in container to validate CLI
+- [x] Add `.github/workflows/pr-check.yml`
+  - [x] Matrix build: `cpu`, `cuda`
+  - [x] Bun setup + lint + Dockerfile lint via Hadolint
+  - [x] Build image with BuildKit + cache
+  - [x] Test `cpu` image in container
+  - [x] Skip CUDA test on GitHub-hosted runners
+- [x] Use GHCR cache for faster builds
+- [x] Fix Dockerfile caching and build warnings
 
 ---
 
-### Phase 6: Polish & Release
-- [ ] Update `README.md` with:
-  - [ ] CLI usage examples
-  - [ ] CPU vs CUDA image behavior
-  - [ ] Docker build/run instructions
-  - [ ] Sample output
-- [ ] Tag initial version
+### Phase 6: DockerHub & Distribution
+- [x] Tag images using format:
+  - `voxextractlabs/vox-whisper:cpu-vX.Y.Z`
+  - `voxextractlabs/vox-whisper:cuda-vX.Y.Z`
+- [x] Push images to DockerHub
+- [x] Create `docs/dockerhub.md`
+- [x] Create DockerHub Overview
+  - [x] Link to GitHub
+  - [x] Explain usage, features, tags, CLI
+- [x] Note that **DockerHub install is preferred**
 
 ---
 
-### CLI Feature Goals (`scripts/cli.py`)
-- [x] Accept CLI arguments: `--input`, `--output`, `--model`, `--language`, `--device`, `--output_format`
-- [x] Validate device availability (e.g., fail on `--device cuda` if no GPU)
-- [x] Export to text, JSON, or SRT
-- [x] Print summary or stats
-- [ ] Stream or batch transcription support
+### Phase 7: Release Automation (Next PR)
+- [ ] Integrate `release-it`
+  - [ ] Manually bump version → Git tag
+  - [ ] Trigger build + push to DockerHub
+  - [ ] Autogenerate changelog (optional)
+- [ ] Add GitHub workflow for publishing on tag
+- [ ] Optional: Push to GHCR alongside DockerHub
+
+---
+
+### CLI Feature Goals (`cli.py`)
+- [x] Accept CLI args: `--input`, `--output`, `--model`, `--language`, `--device`, `--output_format`
+- [x] Fail early on invalid/missing input
+- [x] Auto-detect CUDA without importing `torch`
+- [x] Export to:
+  - [x] Plain text
+  - [x] JSON (with optional word timestamps)
+  - [x] SRT (with formatted timestamps)
+- [x] Handle errors gracefully (file I/O, model errors)
+- [x] Runs as non-root user
+- [x] Tests and verifies both CPU and GPU logic
+- [ ] ✨ Streamed or chunked transcription (Future)
+- [ ] ✨ Optional metadata summary in output
 

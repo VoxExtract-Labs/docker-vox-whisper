@@ -8,7 +8,6 @@
     "scripts": {
         "lint": "bun biome check",
         "lint:fix": "bun biome check --write",
-        "coverage": "bun test --coverage --coverage-reporter=lcov",
         "prepare": "if [ \"$CI\" = \"true\" ]; then echo 'CI detected: skipping lefthook install'; else bunx lefthook install; fi",
         "commitlint": "bunx commitlint --edit $1"
     },
