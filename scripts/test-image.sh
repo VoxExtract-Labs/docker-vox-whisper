@@ -1,5 +1,6 @@
 #!/bin/bash
 set -e
+GPU_FLAGS=()
 
 # Parse variant
 VARIANT="$1"
@@ -8,6 +9,7 @@ if [[ "$VARIANT" == "--cpu" ]]; then
   IMAGE="vox-whisper:cpu"
 elif [[ "$VARIANT" == "--cuda" ]]; then
   IMAGE="vox-whisper:cuda"
+  GPU_FLAGS=(--gpus all)
 else
   echo "Usage: $0 [--cpu | --cuda]"
   exit 1
@@ -23,6 +25,7 @@ rm -f "$OUTPUT_FILE"
 
 echo "🚀 Running containerized test with image $IMAGE..."
 docker run --rm \
+  "${GPU_FLAGS[@]}" \
   -v "$PWD/$OUTPUT_DIR:/app/output" \
   --entrypoint python3 \
   "$IMAGE" \

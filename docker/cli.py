@@ -4,6 +4,7 @@ import argparse
 import json
 import time
 from faster_whisper import WhisperModel
+from utils import is_cuda_available
 
 download_root = os.environ.get("WHISPER_CACHE", "/models")
 
@@ -43,8 +44,8 @@ def main():
 
     # Device detection without torch
     if args.device == "auto":
-        args.device = "cuda" if os.path.exists("/dev/nvidia0") else "cpu"
-    elif args.device == "cuda" and not os.path.exists("/dev/nvidia0"):
+        args.device = "cuda" if is_cuda_available() else "cpu"
+    elif args.device == "cuda" and not is_cuda_available():
         sys.exit("ERROR: CUDA requested but /dev/nvidia0 not found (is NVIDIA runtime available?).")
 
     # Determine compute type

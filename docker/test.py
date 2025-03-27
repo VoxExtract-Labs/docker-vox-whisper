@@ -1,6 +1,7 @@
 import os
 import subprocess
 import sys
+from utils import is_cuda_available
 
 AUDIO_PATH = "/app/audio/sample.mp3"
 OUTPUT_PATH = "/app/output/transcript.txt"
@@ -46,7 +47,7 @@ if __name__ == "__main__":
     validate_output()
 
     # Then optionally test CUDA if available
-    if os.path.exists("/dev/nvidia0"):
+    if is_cuda_available():
         print("⚡ Detected CUDA. Running test with GPU...")
         run_transcription("cuda")
         validate_output()
