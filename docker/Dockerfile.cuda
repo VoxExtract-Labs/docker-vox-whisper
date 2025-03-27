@@ -1,4 +1,4 @@
-FROM nvidia/cuda:12.4.1-base-ubuntu22.04
+FROM nvidia/cuda:12.4.1-cudnn-runtime-ubuntu22.04
 LABEL maintainer="Angel S. Moreno <angelxmoreno@gmail.com>"
 
 WORKDIR /app
@@ -15,13 +15,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     git \
     && rm -rf /var/lib/apt/lists/*
 
-# Add cuDNN runtime libraries (required for faster-whisper GPU inference)
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    libcudnn8=8.9.5.29-1+cuda12.4 \
-    libcudnn8-dev=8.9.5.29-1+cuda12.4 \
-    && rm -rf /var/lib/apt/lists/*
-
-# Python packages
+# Install Python dependencies
 RUN pip install --no-cache-dir faster-whisper==1.1.1
 
 # Create non-root user
