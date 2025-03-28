@@ -1,0 +1,19 @@
+{
+    "plugins": {
+        "@release-it/conventional-changelog": {
+            "preset": "conventionalcommits"
+        }
+    },
+    "git": {
+        "commitMessage": "chore(release): v${version}",
+        "tagName": "v${version}"
+    },
+    "npm": false,
+    "github": {
+        "release": true,
+        "tokenRef": "GITHUB_TOKEN"
+    },
+    "hooks": {
+        "after:bump": "bun run changelog"
+    }
+}
