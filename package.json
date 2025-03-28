@@ -9,8 +9,8 @@
         "lint": "bun biome check",
         "lint:fix": "bun biome check --write",
         "prepare": "if [ \"$CI\" = \"true\" ]; then echo 'CI detected: skipping lefthook install'; else bunx lefthook install; fi",
-        "release": "release-it",
-        "changelog": "release-it --only-changelog",
+        "release": "GITHUB_TOKEN=$(gh auth token) release-it",
+        "changelog": "GITHUB_TOKEN=$(gh auth token) release-it --only-changelog",
         "commitlint": "bunx commitlint --edit $1"
     },
     "devDependencies": {
