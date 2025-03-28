@@ -74,7 +74,7 @@ Dockerized wrapper for [faster-whisper](https://github.com/SYSTRAN/faster-whispe
   - `voxextractlabs/vox-whisper:cpu-vX.Y.Z`
   - `voxextractlabs/vox-whisper:cuda-vX.Y.Z`
 - [x] Push images to DockerHub
-- [x] Create `docs/dockerhub.md`
+- [x] Create `docs/dockerhub-overview.md`
 - [x] Create DockerHub Overview
   - [x] Link to GitHub
   - [x] Explain usage, features, tags, CLI
@@ -83,11 +83,11 @@ Dockerized wrapper for [faster-whisper](https://github.com/SYSTRAN/faster-whispe
 ---
 
 ### Phase 7: Release Automation (Next PR)
-- [ ] Integrate `release-it`
-  - [ ] Manually bump version → Git tag
-  - [ ] Trigger build + push to DockerHub
-  - [ ] Autogenerate changelog (optional)
-- [ ] Add GitHub workflow for publishing on tag
+- [x] Integrate `release-it`
+  - [x] Manually bump version → Git tag
+  - [x] Trigger build + push to DockerHub
+  - [x] Autogenerate changelog (optional)
+- [x] Add GitHub workflow for publishing on tag
 - [ ] Optional: Push to GHCR alongside DockerHub
 
 ---

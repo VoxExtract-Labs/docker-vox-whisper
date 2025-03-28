@@ -1,73 +1,98 @@
-## Release Process for `docker-vox-whisper`
+## `docker-vox-whisper`: Release Guide
 
-This guide outlines the recommended release workflow for the `docker-vox-whisper` project. It uses [`release-it`](https://github.com/release-it/release-it) to automate version bumps, tagging, and triggering Docker image builds.
-
----
-
-### ✅ Requirements
-- You have push access to the repository.
-- You are ready to release a stable and tested version.
-- The `main` branch is up-to-date.
-- `bun` and `release-it` are already installed.
+### Overview
+This document outlines the steps for publishing and releasing new versions of the Docker images (`cpu` and `cuda`) for the `docker-vox-whisper` project.
 
 ---
 
-### 🚀 Release Workflow
+### 🧩 Prerequisites
+- DockerHub account with access to `voxextractlabs/vox-whisper`
+- `release-it` installed via devDependencies
+- Logged in to DockerHub locally via `docker login`
 
-#### 1. **Create a release branch**
+---
+
+### 🚀 Release Workflow (Manual)
+
+1. **Ensure main is up-to-date**
 ```bash
 git checkout main
 git pull origin main
-git checkout -b release/v1.0.0  # Adjust version accordingly
 ```
 
-#### 2. **Run the release script**
-This will:
-- Bump `package.json` version
-- Create a Git tag
-- Push the tag to GitHub
-
+2. **Run release-it** (bumps version, creates tag, commits)
 ```bash
 bun run release
 ```
 
-> `release-it` is configured to skip GitHub releases. It only bumps, commits, tags, and pushes.
-
-#### 3. **Push the release branch and open a PR**
+3. **Push the tag + version bump commit**
 ```bash
-git push origin release/v1.0.0
+git push --follow-tags
 ```
 
-Then open a pull request from `release/v1.0.0` → `main`.
+4. **GitHub Actions builds and pushes images**
+- A `release.yml` workflow will build both images and publish them to **DockerHub**.
+- Each image is tagged using format:
+  - `voxextractlabs/vox-whisper:cpu-vX.Y.Z`
+  - `voxextractlabs/vox-whisper:cuda-vX.Y.Z`
 
-#### 4. **GitHub Actions will handle the rest**
-Once the PR is merged:
-- The Git tag (e.g. `v1.0.0`) will trigger a workflow
-- Both CPU and CUDA Docker images will be built and pushed to DockerHub:
-    - `voxextractlabs/vox-whisper:cpu-v1.0.0`
-    - `voxextractlabs/vox-whisper:cuda-v1.0.0`
+---
+
+### 🧪 Testing Before Releasing
+
+```bash
+./scripts/build-dev.sh --cpu
+./scripts/test-image.sh --cpu
+
+./scripts/build-dev.sh --cuda
+./scripts/test-image.sh --cuda
+```
+
+Ensure both pass before running `release-it`.
+
+---
+
+### 🐳 Publish to GHCR (Optional)
+
+GHCR (GitHub Container Registry) is a powerful alternative or supplement to DockerHub:
+
+#### ✅ Benefits of GHCR
+- **Seamless GitHub integration**: Uses `GITHUB_TOKEN` for auth.
+- **Free private repos** (great for early-stage/internal builds).
+- **Fine-grained permissions**: org, team, or repo-based.
+- **Traceability**: Tied to repo tags/releases.
+- **Faster GitHub CI pulls**: Optimized for use with GitHub Actions.
+- **Cleaner monorepo workflows**: Keep everything in GitHub.
+
+#### When to Prefer DockerHub
+- Broader discoverability.
+- Zero-auth public pulls.
+- More familiar to general Docker users.
+
+✅ **Dual-publishing is ideal** — support both `docker pull` from DockerHub and GHCR.
+
+---
+
+### 🔖 Tagging Strategy
+Use the following tag structure:
+
+- `cpu-vX.Y.Z` → CPU-only image
+- `cuda-vX.Y.Z` → GPU (CUDA) image
+
+Examples:
+```bash
+voxextractlabs/vox-whisper:cpu-v1.0.0
+voxextractlabs/vox-whisper:cuda-v1.1.2
+```
 
 ---
 
 ### 📝 Notes
-- Do **not** run `release-it` on `main` directly unless you're bypassing PRs.
-- The `release.yml` GitHub Actions workflow will match the tag and determine which images to publish.
-- Be sure to verify DockerHub tags and image content post-release.
+- Do **not** use `latest` tags to avoid ambiguity.
+- CI uses `ci-cache` tags and does **not** publish to public registries.
+- Only stable, tagged releases should be published to DockerHub/GHCR.
 
 ---
 
-### 🔁 Tagging Strategy
-- Format: `<type>-vX.Y.Z`
-- Examples:
-    - `voxextractlabs/vox-whisper:cpu-v1.0.0`
-    - `voxextractlabs/vox-whisper:cuda-v2.1.0`
-
----
-
-### 📦 Optional: Publish to GHCR
-This can be added as an additional step in the future to publish images to GitHub Container Registry.
-
----
-
-**Maintainer:** VoxExtract Labs <voxextractlabs@gmail.com>
+Maintainer: **VoxExtract Labs** (<voxextractlabs@gmail.com>)
 
