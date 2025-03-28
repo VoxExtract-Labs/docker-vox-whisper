@@ -15,7 +15,5 @@
         "release": true,
         "tokenRef": "GITHUB_TOKEN"
     },
-    "hooks": {
-        "after:bump": "bun run changelog"
-    }
+    "hooks": {}
 }
