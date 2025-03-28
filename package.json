@@ -1,6 +1,6 @@
 {
     "name": "docker-vox-whisper",
-    "version": "0.1.0",
+    "version": "0.0.0",
     "description": "Dockerized wrapper for faster-whisper with CLI support and dual CPU/GPU builds. Part of the VoiceExtractor project.",
     "license": "MIT",
     "repository": "https://github.com/VoxExtract-Labs/docker-vox-whisper",
